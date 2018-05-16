@@ -7,11 +7,11 @@ package cl.ufro.app.controller;
 
 import cl.ufro.app.model.JSONRequest;
 import cl.ufro.app.model.JSONResponse;
+import cl.ufro.app.model.Token;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,45 +23,49 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class PosTaggerController {
-    
+
     /**
      * Metodo para realizar el etiquetado de las palabras
+     *
      * @param jsonTexto
-     * @return 
+     * @return
      */
-    @PostMapping("/stanford-pos") 
+    @PostMapping("/stanford-pos")
     @ResponseBody
-    private ArrayList<JSONResponse> posTagger(@RequestBody JSONRequest jsonTexto){
-        
-        ArrayList<JSONResponse> jsonResponse = new ArrayList();
-        
+    public ArrayList<JSONResponse> posTagger(@RequestBody JSONRequest jsonTexto) {
+
+        ArrayList<JSONResponse> jsonResponse = new ArrayList();        
+
         //Se añade el idioma para aplicar las categorias gramaticales correspondientes
-        MaxentTagger tagger = new MaxentTagger(
-                                "taggers/spanish-distsim.tagger");
+        MaxentTagger tagger = new MaxentTagger("taggers/spanish-distsim.tagger");        
+
+        String[] palabras = jsonTexto.getTexto().split(" ");        
+        Token[] token = new Token[palabras.length];
         
-        String tagged = tagger.tagString(jsonTexto.getTexto());
-        
-        String [] tokens = jsonTexto.getTexto().split(" ");
-        
-        List<TaggedWord> palabras = tagger.tagSentence(Arrays.asList(tokens));
-                               
-        JSONResponse auxResponse;
-        for (int i = 0; i < tokens.length; i++) {
-            auxResponse = new JSONResponse(tokens[i], palabras.get(i).tag());
-            
-            jsonResponse.add(auxResponse);
+        for (int i = 0; i < palabras.length; i++) {
+            token[i] = new Token(palabras[i]);
         }
         
-        return jsonResponse;                        
-    }
-    
-    
-    @PostMapping("/stanford-pos-file")
-    private ArrayList<JSONResponse> posTaggerFile(){
+        JSONResponse auxResponse;
+        int i =0;               
         
-        ArrayList<JSONResponse> jsonResponse = new ArrayList();
         
+        for (TaggedWord palabra : tagger.tagSentence(Arrays.asList(token))) {
+
+            auxResponse = new JSONResponse(token[i++].word(), palabra.tag());
+
+            jsonResponse.add(auxResponse);
+        }
+
         return jsonResponse;
     }
-    
+
+    @PostMapping("/stanford-pos-file")
+    public String posTaggerFile() {
+
+        ArrayList<JSONResponse> jsonResponse = new ArrayList();
+
+        return "";
+    }
+
 }
