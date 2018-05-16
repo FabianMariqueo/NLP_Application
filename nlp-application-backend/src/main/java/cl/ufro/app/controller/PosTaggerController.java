@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package cl.ufro.controller;
+package cl.ufro.app.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,12 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Batman
  */
 @RestController
-public class HomeController {
+public class PosTaggerController {
     
-    
-    @GetMapping("/")
-    public String home(){
-        return "caca seca";
+    @PostMapping("/stanford-pos")    
+    private String posTagger(){
+        return "";
     }
     
 }
